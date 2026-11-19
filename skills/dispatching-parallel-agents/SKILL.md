@@ -13,6 +13,12 @@ When you have multiple unrelated failures (different test files, different subsy
 
 **Core principle:** Dispatch one agent per independent problem domain. Let them work concurrently.
 
+Choose each worker's model using
+[subagent-driven-development's Model Selection](../subagent-driven-development/SKILL.md#model-selection).
+This applies to standalone reviews and investigations, not only planned
+implementation. Use supported explicit model selection; do not default to
+premium simply because the parent session uses it.
+
 ## When to Use
 
 ```dot

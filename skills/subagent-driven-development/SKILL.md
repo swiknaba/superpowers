@@ -139,40 +139,32 @@ ledger.
 
 ## Model Selection
 
-Use the least powerful model that can handle each role to conserve cost and increase speed.
+Choose the least expensive available model likely to complete the task
+reliably, including reviewers and the final whole-branch review. Role
+names and diff size alone do not justify a premium model. In a mixed diff,
+size the review to its highest-risk material change, not its average line.
 
-**Mechanical implementation tasks** (isolated functions, clear specs, 1-2 files): use a fast, cheap model. Most implementation tasks are mechanical when the plan is well-specified.
+- **Cheap/fast:** bounded mechanical changes, clear requirements, simple
+  reviews, and focused re-reviews. A prose task does not impose a tier floor.
+- **Standard:** unfamiliar integrations, multi-step debugging, or moderate
+  judgment across components.
+- **Premium:** concrete high-risk reasoning such as authorization boundaries,
+  concurrency, irreversible data migrations, or unresolved architecture
+  tradeoffs. A two-line security fix may warrant this; a whole-branch typo
+  review does not.
 
-**Integration and judgment tasks** (multi-file coordination, pattern matching, debugging): use a standard model.
+Use actual model options exposed by the harness; do not invent model IDs
+or price rankings. Honor the human partner's model choice and runtime
+restrictions. Where selection is supported, specify the model explicitly
+rather than silently inheriting an expensive session default. Where it is
+not supported, report that limitation, not a fictitious cheaper dispatch.
 
-**Architecture and design tasks**: use the most capable available model.
-The final whole-branch review is one of these — dispatch it on the most
-capable available model, not the session default.
-
-**Review tasks**: choose the model with the same judgment, scaled to the
-diff's size, complexity, and risk. A small mechanical diff does not need the
-most capable model; a subtle concurrency change does. Scoped re-reviews of
-small fix diffs take a cheap-to-mid tier.
-
-**Fix-loop escalation (rounds 4-5)**: use a model at least one tier above
-the implementer that got stuck.
-
-**Always specify the model explicitly when dispatching a subagent.** An
-omitted model inherits your session's model — often the most capable and
-most expensive — which silently defeats this section.
-
-**Turn count beats token price.** Wall-clock and context cost scale with how
-many turns a subagent takes, and the cheapest models routinely take 2-3× the
-turns on multi-step work — costing more overall. Use a mid-tier model as the
-floor for reviewers and for implementers working from prose descriptions.
-When the task's plan text contains the complete code to write, the
-implementation is transcription plus testing: use the cheapest tier for
-that implementer. Single-file mechanical fixes also take the cheapest tier.
-
-**Task complexity signals (implementation tasks):**
-- Touches 1-2 files with a complete spec → cheap model
-- Touches multiple files with integration concerns → standard model
-- Requires design judgment or broad codebase understanding → most capable model
+Record the tier and one short reason in the existing dispatch or ledger.
+If a worker stalls, first correct missing context or an oversized task.
+Escalate for demonstrated reasoning difficulty, not automatically on a
+round number. Compare total effort, retries, latency, and context size,
+not token price alone. Do not repeat a completed review solely to use a
+larger model.
 
 ## The Task Loop
 

@@ -9,40 +9,33 @@ description: Use when implementing any feature or bugfix, before writing impleme
 
 Write the test first. Watch it fail. Write minimal code to pass.
 
-**Core principle:** If you didn't watch the test fail, you don't know if it tests the right thing.
+**Core principle:** Prove tests detect the intended failure; do not write
+tests merely to satisfy a process. Choose the necessary coverage first.
 
-**Violating the letter of the rules is violating the spirit of the rules.**
+## Choose the Test Before the Cycle
 
-## When to Use
+Read [writing-good-tests.md](writing-good-tests.md) before choosing tests.
+Name the observable failure this change could introduce, then check whether
+an existing test already catches it. Extend that test where needed instead
+of adding another test for the same risk.
 
-**Always:**
-- New features
-- Bug fixes
-- Refactoring
-- Behavior changes
+Use red-green-refactor for new behavior and bug regressions. Do not create
+new tests for data-only enum entries, literal configuration, trivial
+forwarding, generated output, or prose when existing behavior checks or
+validation already cover the change. No permission ritual is needed for
+these cases; report what you verified and any real coverage gap.
 
-**Exceptions (ask your human partner):**
-- Throwaway prototypes
-- Generated code
-- Configuration files
+A constant can be part of an external contract (wire values, exported CSV
+columns, persisted states). Test the observable contract at its boundary,
+not that the source repeats the same literal. Security, money, data loss,
+and plausible boundary failures deserve tests even in tiny diffs.
 
-Thinking "skip TDD just this once"? Stop. That's rationalization.
-
-## The Iron Law
-
-```
-NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
-```
-
-Write code before the test? Delete it. Start over.
-
-**No exceptions:**
-- Don't keep it as "reference"
-- Don't "adapt" it while writing tests
-- Don't look at it
-- Delete means delete
-
-Implement fresh from tests. Period.
+Prefer one focused scenario with related assertions to many tests that
+repeat setup. There is no test-count, function-count, or coverage quota.
+Do not delete working code merely because it predates a test: demonstrate
+that the regression test detects the old behavior, or use a temporary,
+reversible mutation and restore only your own mutation before finishing.
+Preserve pre-existing edits; use an isolated worktree when needed.
 
 ## Red-Green-Refactor
 
@@ -112,7 +105,7 @@ Vague name, tests mock not code
 
 ### Verify RED - Watch It Fail
 
-**MANDATORY. Never skip.**
+**When the red-green cycle applies, observing RED is mandatory.**
 
 ```bash
 npm test path/to/test.test.ts
@@ -123,7 +116,9 @@ Confirm:
 - Failure message is expected
 - Fails because feature missing (not typos)
 
-**Test passes?** You're testing existing behavior. Fix test.
+**New regression passes before the fix?** Check whether it actually reproduces
+the bug. Existing passing coverage is useful evidence, not a reason to
+invent a new failure.
 
 **Test errors?** Fix error, re-run until it fails correctly.
 
@@ -209,7 +204,7 @@ Next failing test for next feature.
 
 | Quality | Good | Bad |
 |---------|------|-----|
-| **Minimal** | One thing. "and" in name? Split it. | `test('validates email and domain and whitespace')` |
+| **Minimal** | One scenario; keep related outcome assertions together. | `test('validates email and domain and whitespace')` |
 | **Clear** | Name describes behavior | `test('test1')` |
 | **Shows intent** | Demonstrates desired API | Obscures what code should do |
 
@@ -219,39 +214,14 @@ When writing or changing any test, read [writing-good-tests.md](writing-good-tes
 - Keep test-only code in test utilities, out of production classes
 - Understand a dependency's side effects before mocking it
 
-## Common Rationalizations
+## Avoid False Confidence
 
-| Excuse | Reality |
-|--------|---------|
-| "Too simple to test" | Simple code breaks. Test takes 30 seconds. |
-| "I'll test after" | Tests written after pass immediately — which proves nothing. They may test the wrong thing, test the implementation instead of the behavior, or miss the edge case you forgot. You never watched it fail, so you never proved it can catch the bug. Test-first forces that failure. |
-| "Tests after achieve same goals (spirit not ritual)" | Tests-after answer "what does this do?"; tests-first answer "what should this do?" Tests written after are biased by the code you already wrote — you verify the cases you remembered, not the ones you'd have discovered. Coverage without proof the tests work. |
-| "Already manually tested" | Manual testing is ad-hoc: no record of what you covered, no way to re-run it when the code changes, easy to forget cases under pressure. "Worked when I tried it" ≠ comprehensive. Automated tests run the same way every time. |
-| "Deleting X hours is wasteful" | Sunk cost fallacy — that time is already spent either way. The real choice: rewrite with TDD (high confidence) vs. keep it and bolt tests on after (low confidence, likely bugs). Keeping code you can't trust is the waste. |
-| "Keep as reference, write tests first" | You'll adapt it. That's testing after. Delete means delete. |
-| "Need to explore first" | Fine. Throw away exploration, start with TDD. |
-| "Test hard = design unclear" | Listen to test. Hard to test = hard to use. |
-| "TDD will slow me down" | TDD IS the pragmatic path: catches bugs before commit, prevents regressions, lets you refactor without fear. "Pragmatic" shortcuts mean debugging in production — slower, not faster. |
-| "Manual test faster" | Manual doesn't prove edge cases. You'll re-test every change. |
-| "Existing code has no tests" | You're improving it. Add tests for existing code. |
-
-## Red Flags - STOP and Start Over
-
-- Code before test
-- Test after implementation
-- Test passes immediately
-- Can't explain why test failed
-- Tests added "later"
-- Rationalizing "just this once"
-- "I already manually tested it"
-- "Tests after achieve the same purpose"
-- "It's about spirit not ritual"
-- "Keep as reference" or "adapt existing code"
-- "Already spent X hours, deleting is wasteful"
-- "TDD is dogmatic, I'm being pragmatic"
-- "This is different because..."
-
-**All of these mean: Delete code. Start over with TDD.**
+- A green test is not evidence it catches the bug: observe the relevant
+  failure before the fix, or verify it against the old behavior.
+- A test that only repeats a constant or enum definition adds maintenance,
+  not confidence. Exercise the consumer instead, if it has an uncovered risk.
+- Do not skip a real regression because the fix is small or the deadline is
+  short. Keep the regression narrow rather than broadening the test suite.
 
 ## Example: Bug Fix
 
@@ -294,8 +264,8 @@ Extract validation for multiple fields if needed.
 
 Before marking work complete:
 
-- [ ] Every new function/method has a test
-- [ ] Watched each test fail before implementing
+- [ ] Changed behavior and realistic regressions are covered without duplicate tests
+- [ ] Each new regression demonstrated the relevant failure before the fix or against old behavior
 - [ ] Each test failed for expected reason (feature missing, not typo)
 - [ ] Wrote minimal code to pass each test
 - [ ] All tests pass
@@ -303,7 +273,7 @@ Before marking work complete:
 - [ ] Tests use real code (mocks only if unavoidable)
 - [ ] Edge cases and errors covered
 
-Can't check all boxes? You skipped TDD. Start over.
+Report any unchecked item honestly; fix material coverage gaps, not paperwork.
 
 ## When Stuck
 
@@ -318,13 +288,9 @@ Can't check all boxes? You skipped TDD. Start over.
 
 Bug found? Write failing test reproducing it. Follow TDD cycle. Test proves fix and prevents regression.
 
-Never fix bugs without a test.
+Add a focused regression where feasible; report a concrete verification limit rather than manufacturing a low-value test.
 
 ## Final Rule
 
-```
-Production code → test exists and failed first
-Otherwise → not TDD
-```
-
-No exceptions without your human partner's permission.
+Every new test must catch a meaningful failure that existing tests miss.
+Every changed behavior needs appropriate evidence, not necessarily a new test.

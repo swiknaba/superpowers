@@ -5,8 +5,8 @@ Use this template when dispatching an implementer subagent.
 ```
 Subagent (general-purpose):
   description: "Implement Task N: [task name]"
-  model: [MODEL — REQUIRED: choose per SKILL.md Model Selection; an omitted
-         model silently inherits the session's most expensive one]
+  model: [MODEL — choose per SKILL.md Model Selection where supported;
+         do not invent unsupported parameters]
   prompt: |
     You are implementing Task N: [task name]
 
@@ -33,7 +33,7 @@ Subagent (general-purpose):
 
     Once you're clear on requirements:
     1. Implement exactly what the task specifies
-    2. Write tests (following TDD if task says to)
+    2. Reuse or extend behavior tests for meaningful uncovered risks (TDD for new behavior)
     3. Verify implementation works
     4. Commit your work
     5. Self-review (see below)
@@ -71,6 +71,13 @@ Subagent (general-purpose):
       and note it as a concern in your report
     - In existing codebases, follow established patterns. Improve code you're touching
       the way a good developer would, but don't restructure things outside your task.
+
+    ## Comments
+
+    Prefer clear names and structure to commentary. Add a short comment only
+    for a non-obvious reason, constraint, workaround, or invariant a future
+    edit could violate. Do not narrate assignments, loops, or obvious tests.
+    Preserve required license notices and useful API documentation.
 
     ## When You're in Over Your Head
 
@@ -111,7 +118,10 @@ Subagent (general-purpose):
     **Testing:**
     - Do tests actually verify behavior (not just mock behavior)?
     - Did I follow TDD if required?
-    - Are tests comprehensive?
+    - Does each added test catch a distinct realistic regression?
+    - Did I reuse coverage rather than merely repeat constants or enum declarations?
+    - Could a declaration-only change break a wire/persistence contract or affect
+      security, money, or data loss? Verify the boundary behavior in those cases.
     - Is the test output pristine (no stray warnings or noise)?
 
     If you find issues during self-review, fix them now before reporting.
@@ -129,7 +139,8 @@ Subagent (general-purpose):
 
     Write your full report to [REPORT_FILE]:
     - What you implemented (or what you attempted, if blocked)
-    - What you tested and test results
+    - Coverage: name reused or added tests/checks, the failure they detect, and
+      the actual command/result; if none applies, explain the verification limit.
     - **TDD Evidence** (if TDD was required for this task):
       - RED: command run, relevant failing output before implementation, and why the failure was expected
       - GREEN: command run and relevant passing output after implementation

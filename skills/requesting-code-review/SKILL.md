@@ -9,6 +9,12 @@ Dispatch a code reviewer subagent to catch issues before they cascade. The revie
 
 **Core principle:** Review early, review often.
 
+Choose each worker's model using
+[subagent-driven-development's Model Selection](../subagent-driven-development/SKILL.md#model-selection).
+This applies to standalone reviews and investigations, not only planned
+implementation. Use supported explicit model selection; do not default to
+premium simply because the parent session uses it.
+
 ## When to Request Review
 
 **Mandatory:**

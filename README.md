@@ -1,3 +1,8 @@
+> **Personal fork:** This fork customizes test selection, code comments, and
+> subagent model selection for its owner. Upstream: [obra/superpowers](https://github.com/obra/superpowers).
+> Customizations are reviewed through PRs in this fork, not submitted upstream.
+> The upstream license and attribution are unchanged.
+
 # Superpowers
 
 Superpowers is a complete software development methodology for your coding agents, built on top of a set of composable skills and some initial instructions that make sure your agent uses them.

@@ -10,8 +10,8 @@ that the fix itself broke nothing.
 ```
 Subagent (general-purpose):
   description: "Re-review Task N fix round R"
-  model: [MODEL — REQUIRED: choose per SKILL.md Model Selection; an omitted
-         model silently inherits the session's most expensive one]
+  model: [MODEL — choose per SKILL.md Model Selection where supported;
+         do not invent unsupported parameters]
   prompt: |
     You are re-reviewing one task's fix round. A previous review produced
     findings; an implementer has attempted to fix them. Your job is to
@@ -61,11 +61,16 @@ Subagent (general-purpose):
     does not block this task and does not extend the loop. A broad
     whole-branch review happens after all tasks are complete.
 
+    Judge coverage by the failure it detects, not test count. Existing
+    checks can verify a fix; declaration-only changes still need boundary
+    coverage when contracts, security, money, or data loss are affected.
+    Comments should explain non-obvious reasons, not narrate readable code.
+
     ## Tests
 
-    The implementer re-ran the tests covering the amended code and appended
+    The implementer ran the applicable checks covering the amended code and appended
     the results to the report file. Treat the report as unverified claims:
-    confirm the fix report names the covering tests and shows their output,
+    confirm the fix report names the covering checks and shows their output,
     and verify the claims against the diff. Do not re-run the suite to
     confirm their report. Run a test only when reading the code raises a
     specific doubt that no existing run answers — and then a focused test,
