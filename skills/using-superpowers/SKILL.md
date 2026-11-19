@@ -63,3 +63,11 @@ If your harness appears here, read its reference file for special instructions:
 ## User Instructions
 
 User instructions (CLAUDE.md, AGENTS.md, GEMINI.md, etc, direct requests) take precedence over skills, which in turn override default behavior. Only skip skill workflows or instructions when your human partner has explicitly told you to.
+
+## Personal Fork Defaults
+
+Tests protect behavior, not declarations: reuse existing coverage and add
+only cases that catch distinct realistic failures. Prefer readable code
+over comments; explain only non-obvious reasons or constraints. Choose
+subagent models by task risk and complexity, not role prestige; see
+subagent-driven-development's Model Selection when dispatching.

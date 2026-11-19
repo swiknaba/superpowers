@@ -40,6 +40,17 @@ deliverable needs them; split only where a reviewer could meaningfully
 reject one task while approving its neighbor. Each task ends with an
 independently testable deliverable.
 
+## Test Selection
+
+Plan tests by distinct failure mode, not per function or enum member. Name
+existing coverage before adding cases. Configuration and documentation steps
+can use existing validation instead of artificial red-green steps. Related
+assertions belong in one scenario; additional cases must catch a different
+plausible regression. Constants/configuration can change wire, persistence,
+security or money contracts: identify the boundary checks that prove the
+intended behavior, reusing or extending coverage rather than exempting by
+file type.
+
 ## Step Granularity
 
 **Each step is one action with a checkable result:**
@@ -76,20 +87,24 @@ include this section.]
 
 ## Review Focus
 
-[The five input classes or failure modes the spec implies but no task's
+[The material input classes or failure modes the spec implies but no task's
 tests exercise that are most likely to bite a person using this software
 — one line each, naming the input or condition and the behavior a
 reasonable person would expect, most likely first. The spec is a vision
 document: it says what the software must do, not everything it will
 meet, and its silence on an input is not permission for that input to
 break the program. Write the list here, once, with the spec in front of
-you. Then, for each line, add the test that pins it to the task that
+you. For each uncovered risk worth automating, add or extend a test in the task that
 owns the code, in that task's own step style.]
 
 ---
 ```
 
 ## Task Structure
+
+The example below is for new behavior. For data-only, configuration, or
+prose tasks already covered, replace the red-green steps with the applicable
+existing verification command and expected outcome.
 
 ````markdown
 ### Task N: [Component Name]
@@ -170,7 +185,7 @@ After writing the complete plan, look at the spec with fresh eyes and check the 
 
 **3. Type consistency:** Do the types, method signatures, and property names you used in later tasks match what you defined in earlier tasks? A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
 
-**4. Review Focus:** For each input class or failure mode the spec implies, is there a task whose tests exercise it? The five uncovered ones most likely to bite a person go in the Review Focus section, and each line there gets its test added to the owning task. An empty section means you checked and found none, not that you skipped the check.
+**4. Review Focus:** For each input class or failure mode the spec implies, is there a task whose tests exercise it? Only material uncovered risks go in Review Focus. Reuse existing tests where sufficient; no minimum number of risks or new tests. An empty section means you checked and found none, not that you skipped the check.
 
 **5. Proportion:** Compare the plan's length to the spec's. A plan several times longer than the spec it implements is a transcript of the program, not a plan. If code blocks are most of the document, replace bodies with signatures, test names and assertions, and check that each step is still unambiguous.
 
@@ -189,7 +204,7 @@ them to review the plan and choose an execution method before implementation.
 **"Plan complete and saved to `docs/superpowers/plans/<filename>.md`. Please review the plan. Which execution approach would you prefer?**
 
 - **Subagent-driven** - A fresh subagent implements each task and a fresh reviewer checks it before the next one starts, then a whole-branch review at the end. Most thorough; costs a fresh context per task and per review.
-- **Native** - I implement every task myself in this session, the way this harness runs work, then one fresh reviewer on the most capable model checks the whole branch. Cheapest and fastest; no independent review until the end. Runs well with a mid-tier session model, since the plan carries the design.
+- **Native** - I implement every task myself in this session, the way this harness runs work, then one fresh reviewer on a risk-appropriate model checks the whole branch. Cheapest and fastest; no independent review until the end. Runs well with a mid-tier session model, since the plan carries the design.
 
 **For this plan I recommend <one of the two>, because <one sentence from the plan: how much the tasks depend on each other's interfaces, how many there are, what a shipped mistake would cost>. Does the plan capture what you want, and which approach should we use?"**
 

@@ -10,8 +10,8 @@ more, nothing less) and is well-built (clean, tested, maintainable)
 ```
 Subagent (general-purpose):
   description: "Review Task N (spec + quality)"
-  model: [MODEL — REQUIRED: choose per SKILL.md Model Selection; an omitted
-         model silently inherits the session's most expensive one]
+  model: [MODEL — choose per SKILL.md Model Selection where supported;
+         do not invent unsupported parameters]
   prompt: |
     You are reviewing one task's implementation: first whether it matches its
     requirements, then whether it is well-built. This is a task-scoped gate,
@@ -52,6 +52,21 @@ Subagent (general-purpose):
     Your review is read-only on this checkout. Do not mutate the working
     tree, the index, HEAD, or branch state in any way.
 
+    ## Review Calibration
+
+    Judge tests by distinct failures they catch, not count or per-method coverage.
+    Ask for a missing test only with a plausible uncovered regression. Do not
+    request explanatory comments for readable code; comments earn their place
+    by explaining a non-obvious constraint or reason. Flag redundant tests and
+    narration when they materially obscure the change, not as stylistic quotas.
+    A reused-coverage claim is a named risk: open the cited test and check
+    that its inputs and assertions exercise the changed path. A green result
+    alone is insufficient. Grade missing protection for material behavior,
+    false confidence from a tautology, or a misleading false contract comment
+    as Important; valid redundant coverage and narration are usually Minor.
+    Declaration-only diffs can break wire/persistence contracts or affect
+    security, money, or data loss: evaluate the boundary behavior and coverage.
+
     ## You Do Not Dispatch Subagents
 
     Do all of this review yourself. Never spawn a subagent to review part
@@ -72,8 +87,8 @@ Subagent (general-purpose):
 
     ## Tests
 
-    The implementer already ran the tests and reported results with TDD
-    evidence for exactly this code. Do not re-run the suite to confirm their
+    The implementer reported the applicable checks for exactly this code:
+    existing coverage/validation, or red-green evidence for new regressions. Do not re-run the suite to confirm their
     report. Run a test only when reading the code raises a specific doubt
     that no existing run answers — and then a focused test, never a
     package-wide suite, race detector run, or repeated/high-count loop. If
