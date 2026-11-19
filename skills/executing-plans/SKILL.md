@@ -65,8 +65,7 @@ last tasks get the least of you.
 ## Verification Scope
 
 Apply test-driven-development's coverage selection before its red-green
-cycle. Existing tests and validation can satisfy data-only, configuration,
-and prose steps. The completion contract and fix loop below do not require
+cycle. Use its conditional exemptions, not the file type alone. The completion contract and fix loop below do not require
 new tests for every task or review finding. Record the applicable check and
 result instead; never manufacture a failing test to satisfy a ledger format.
 
@@ -286,9 +285,11 @@ implementer here — in ONE pass. For a behavior bug, write or extend the
 regression that reproduces it, observe failure, fix it, then run the suite.
 For non-behavior findings, use the applicable validation from Verification
 Scope. Record the actual command and result for each fix in the ledger.
-A failed verification means the pass is not over. Do not dispatch a
-re-review: it would re-read a diff whose covering tests already answer
-"addressed" and whose suite run already answers "broke nothing".
+After fixes to code, runtime configuration, or tests, run the project suite
+once for the complete fix pass. Prose-only fixes use the applicable checks.
+Report blocked or failing checks; never claim a green suite from a validator.
+Do not automatically dispatch another reviewer; report the actual verification
+and any remaining uncertainty.
 
 A finding you decide not to fix is a ruling — `Final: Ruling: <finding> —
 <why the code stands> — <cost if wrong>` — and reaches your human partner

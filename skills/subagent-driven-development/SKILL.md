@@ -142,7 +142,8 @@ ledger.
 Choose the least expensive available model likely to complete the task
 reliably, including reviewers and the final whole-branch review. Role
 names and diff size alone do not justify a premium model. In a mixed diff,
-size the review to its highest-risk material change, not its average line.
+size the review to its highest-risk material change, not its average line. Use the brief/report to identify contract, persistence,
+security and data-loss impact before classifying an edit as mechanical.
 
 - **Cheap/fast:** bounded mechanical changes, clear requirements, simple
   reviews, and focused re-reviews. A prose task does not impose a tier floor.
@@ -226,7 +227,8 @@ and fix-round diffs need it.
   fix-loop rounds 1-3 resume this agent.
 - Never dispatch multiple implementation subagents in parallel (conflicts).
 
-Template: [implementer-prompt.md](implementer-prompt.md)
+Template: [implementer-prompt.md](implementer-prompt.md). Resolve its
+`[TEST_GUIDANCE_PATH]` to the installed sibling test-driven-development/SKILL.md.
 
 ### 2. Handle the report
 

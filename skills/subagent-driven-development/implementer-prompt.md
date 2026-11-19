@@ -19,6 +19,10 @@ Subagent (general-purpose):
 
     [Scene-setting: where this fits, dependencies, architectural context]
 
+    Before selecting or changing tests, read [TEST_GUIDANCE_PATH], the
+    installed test-driven-development/SKILL.md, and its writing-good-tests.md
+    reference. The controller supplies the resolved local path.
+
     ## Before You Begin
 
     If you have questions about:
@@ -77,7 +81,10 @@ Subagent (general-purpose):
     Prefer clear names and structure to commentary. Add a short comment only
     for a non-obvious reason, constraint, workaround, or invariant a future
     edit could violate. Do not narrate assignments, loops, or obvious tests.
-    Preserve required license notices and useful API documentation.
+    Preserve required license notices and useful API documentation. Update
+    or remove comments this edit makes false. Document public contracts the
+    signature cannot express (units, errors, ordering or side effects); do
+    not add a comment when names and types already convey the information.
 
     ## When You're in Over Your Head
 
@@ -117,7 +124,7 @@ Subagent (general-purpose):
 
     **Testing:**
     - Do tests actually verify behavior (not just mock behavior)?
-    - Did I follow TDD if required?
+    - Did new regressions detect the failure, and reused checks cover the changed path?
     - Does each added test catch a distinct realistic regression?
     - Did I reuse coverage rather than merely repeat constants or enum declarations?
     - Could a declaration-only change break a wire/persistence contract or affect

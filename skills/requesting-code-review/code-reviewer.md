@@ -60,6 +60,11 @@ Subagent (general-purpose):
     request explanatory comments for readable code; comments earn their place
     by explaining a non-obvious constraint or reason. Flag redundant tests and
     narration when they materially obscure the change, not as stylistic quotas.
+    A reused-coverage claim is a named risk: open the cited test and check
+    that its inputs and assertions exercise the changed path. A green result
+    alone is insufficient. Grade missing protection for material behavior,
+    false confidence from a tautology, or a misleading false contract comment
+    as Important; valid redundant coverage and narration are usually Minor.
     Declaration-only diffs can break wire/persistence contracts or affect
     security, money, or data loss: evaluate the boundary behavior and coverage.
 
@@ -176,7 +181,7 @@ Subagent (general-purpose):
 ```
 ### Strengths
 - Clean database schema with proper migrations (db.ts:15-42)
-- Comprehensive test coverage (18 tests, all edge cases)
+- Focused coverage of retry exhaustion, recovery, and permanent failures
 - Good error handling with fallbacks (summarizer.ts:85-92)
 
 ### Issues

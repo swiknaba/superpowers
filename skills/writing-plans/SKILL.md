@@ -40,13 +40,16 @@ deliverable needs them; split only where a reviewer could meaningfully
 reject one task while approving its neighbor. Each task ends with an
 independently testable deliverable.
 
-## Test Budget
+## Test Selection
 
 Plan tests by distinct failure mode, not per function or enum member. Name
 existing coverage before adding cases. Configuration and documentation steps
 can use existing validation instead of artificial red-green steps. Related
 assertions belong in one scenario; additional cases must catch a different
-plausible regression.
+plausible regression. Constants/configuration can change wire, persistence,
+security or money contracts: identify the boundary checks that prove the
+intended behavior, reusing or extending coverage rather than exempting by
+file type.
 
 ## Step Granularity
 

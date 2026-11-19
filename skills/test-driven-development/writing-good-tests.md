@@ -13,9 +13,9 @@ here:
 2. Every test exercises the real thing
 ```
 
-Strict TDD produces both naturally: a test written first and watched
-failing against real code has already proven it can fail, and only earns
-a mock when the real dependency proves slow or external.
+A failing regression demonstrates sensitivity to one failure, not test
+quality by itself. Select coverage before the red-green cycle; keep the
+production behavior real and isolate nondeterministic or external boundaries.
 
 ## Principle 1: Name the Break
 
@@ -80,10 +80,13 @@ BEFORE writing the test body:
 
 ## Principle 2: Exercise the Real Thing
 
-**The mock earns no assertions.** A mock assertion passes when the mock
-is present and fails when it is absent — it says nothing about the
-component. Assert the real component's behavior; if the mock is what you
-are checking, unmock it or delete the assertion.
+**Assert the production contract, not the double's setup.** A spy is useful
+when the contract is a boundary interaction: the recipient, payload,
+idempotency key, forbidden call, or required ordering. Invoke the production
+entry point and assert what it sends. Do not assert that a stub returns the
+value you just configured, or verify private collaboration unrelated to a
+public outcome. Prefer state/output assertions when both express the same
+contract.
 
 ```typescript
 // ✅ Real behavior
@@ -116,10 +119,10 @@ part of the contract, assert them — a fake that accepts anything verifies
 nothing. Give each branch (success, error, malformed) its own fixture or
 spy, so the wrong branch cannot satisfy the expectation.
 
-**Mirror real data completely.** Mock the complete structure as it exists
-in reality — all documented fields — not just the ones your test reads.
-Partial mocks fail silently when downstream code reads an omitted field:
-the test passes while integration breaks.
+**Use small, valid fixtures.** Include fields required by the real schema
+and by the exercised contract, with realistic types and relationships. Do
+not copy unrelated fields solely for completeness. Prefer a shared validated
+fixture or typed fake when hand-built doubles can drift from the dependency.
 
 **Production classes carry production methods only.** Cleanup that only
 tests need lives in test utilities, never as a `destroy()` on the
@@ -139,20 +142,33 @@ BEFORE adding a mock or test helper:
   List the real method's side effects; keep the ones the test
   depends on real — mock the slow/external level below them.
 
-  Mock responses mirror the complete real structure.
+  Mock responses satisfy the real schema and exercised contract.
 
   A method only tests call lives in test utilities, not production.
 
-  About to assert on the mock itself?
-    Unmock it or delete the assertion.
+  Is the assertion about a production boundary interaction?
+    Keep it if it checks the contract, not the double's configuration.
 ```
 
 ## Tests Ship With the Implementation
 
-The TDD cycle — failing test, minimal implementation, refactor — is what
-"complete" means. Ship the tests the behavior needs and only those:
-trivial code and human prose earn none, and a test written to satisfy
-process costs maintenance forever.
+Ship the checks selected for the changed behavior, not a test per edit.
+New regressions must detect the failure; reused tests must exercise the
+changed path. Human prose needs review, not source-text assertions.
+
+## Reliable, Readable Tests
+
+Use the lowest layer that exercises the real contract. Prefer small unit or
+component tests; add integration tests for wiring, persistence, or external
+contracts the lower layer cannot establish. Avoid repeating the same risk
+at every layer. A harmless internal refactor should not break expectations.
+
+Control clocks, randomness, scheduling, network and shared state. Use fake
+clocks or synchronization rather than sleeps. Each test must run independently;
+keep live-service checks separate from deterministic tests. Use a few explicit
+fixtures and assertions whose failures explain the violated behavior. Table
+tests fit the same rule with different inputs; property tests fit genuine
+invariants with an independent oracle, not a reimplementation of production.
 
 ## The Mutation Check
 
@@ -178,7 +194,7 @@ test as tautological.
 | Reach for a dependency test | Test your boundary contract, not their documented mechanics |
 | Want to assert on a mocked element | Test the real component, or unmock it |
 | Are about to mock a method | Learn its side effects; mock the slow/external level |
-| Build a mock response | Mirror the real structure completely |
+| Build a mock response | Use a small schema-valid fixture for the exercised contract |
 | Need cleanup only tests use | Put it in test utilities |
 | Watch mock setup balloon | Switch to an integration test with real components |
 | Finish a test file | Run the mutation check |
@@ -192,7 +208,7 @@ test as tautological.
 - The test greps source text, or asserts a removed symbol stays removed
 - The test would still matter if only the framework remained
 - The test exists for coverage, checking no side effect or outcome
-- An assertion checks a `*-mock` test ID, or fails if you remove the mock
+- An assertion checks only a `*-mock` test ID or repeats a stubbed return value
 - A method is called only from test files
 - Mock setup is more than half the test, or you can't explain why the mock is needed
 - Mocking "just to be safe"

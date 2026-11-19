@@ -16,7 +16,8 @@ tests merely to satisfy a process. Choose the necessary coverage first.
 
 Read [writing-good-tests.md](writing-good-tests.md) before choosing tests.
 Name the observable failure this change could introduce, then check whether
-an existing test already catches it. Extend that test where needed instead
+an existing test already catches it. Inspect its inputs and assertions; a
+green suite alone does not prove the changed path is covered. Extend it instead
 of adding another test for the same risk.
 
 Use red-green-refactor for new behavior and bug regressions. Do not create
@@ -36,6 +37,10 @@ Do not delete working code merely because it predates a test: demonstrate
 that the regression test detects the old behavior, or use a temporary,
 reversible mutation and restore only your own mutation before finishing.
 Preserve pre-existing edits; use an isolated worktree when needed.
+
+Before a behavior-preserving refactor, identify coverage for the behavior
+being preserved. Add focused characterization only for material gaps; do not
+create a test for each extracted helper.
 
 ## Red-Green-Refactor
 
@@ -87,21 +92,17 @@ Clear name, tests real behavior, one thing
 <Bad>
 ```typescript
 test('retry works', async () => {
-  const mock = jest.fn()
-    .mockRejectedValueOnce(new Error())
-    .mockRejectedValueOnce(new Error())
-    .mockResolvedValueOnce('success');
-  await retryOperation(mock);
-  expect(mock).toHaveBeenCalledTimes(3);
+  const operation = jest.fn().mockResolvedValue('success');
+  expect(await operation()).toBe('success');
 });
 ```
-Vague name, tests mock not code
+Only exercises the configured stub; never invokes retryOperation
 </Bad>
 
 **Requirements:**
 - One behavior
 - Clear name
-- Real code (no mocks unless unavoidable)
+- Production entry point; doubles only at meaningful boundaries
 
 ### Verify RED - Watch It Fail
 
@@ -116,9 +117,10 @@ Confirm:
 - Failure message is expected
 - Fails because feature missing (not typos)
 
-**New regression passes before the fix?** Check whether it actually reproduces
-the bug. Existing passing coverage is useful evidence, not a reason to
-invent a new failure.
+**New regression passes before the fix?** It has not reproduced the bug.
+Correct the scenario or assertion until it fails for the relevant reason;
+if reproduction is blocked, report that limit. This does not require making
+existing behavior-preserving checks fail.
 
 **Test errors?** Fix error, re-run until it fails correctly.
 
@@ -270,8 +272,8 @@ Before marking work complete:
 - [ ] Wrote minimal code to pass each test
 - [ ] All tests pass
 - [ ] Output pristine (no errors, warnings)
-- [ ] Tests use real code (mocks only if unavoidable)
-- [ ] Edge cases and errors covered
+- [ ] Tests exercise production behavior; doubles isolate appropriate boundaries
+- [ ] Plausible boundary and error failures covered
 
 Report any unchecked item honestly; fix material coverage gaps, not paperwork.
 

@@ -60,15 +60,14 @@ Capture rationalizations from baseline testing (see Testing section below). Ever
 Make it easy for agents to self-check when rationalizing:
 
 ```markdown
-## Red Flags - STOP and Start Over
+## Red Flags - Check the Evidence
 
-- Code before test
-- "I already manually tested it"
-- "Tests after achieve the same purpose"
-- "It's about spirit not ritual"
-- "This is different because..."
+- A regression test passes against the known bug
+- "The suite is green, so the changed path must be covered"
+- An assertion repeats the declaration instead of exercising its consumer
 
-**All of these mean: Delete code. Start over with TDD.**
+**Reproduce the failure or report the verification limit. Do not claim
+coverage from green output alone.**
 ```
 
 ### Update SDO for Violation Symptoms

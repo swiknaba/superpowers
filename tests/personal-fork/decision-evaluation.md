@@ -40,3 +40,53 @@ PR; Claude also reran `git diff --check` successfully.
 This is static review, not a live coding benchmark. Removal of the TDD
 rationalization/red-flag tables has not been pressure-tested in executing
 agent sessions. Cheap reviewers on larger review prompts remain unmeasured.
+
+
+## Fable 5.2 review and bounded live checks
+
+Fable 5.2 (Medium), in a fresh local Claude Code GUI session, independently
+reviewed the diff and intended behavior. It identified reused-coverage
+verification, worker-reference delivery, conditional exemptions, stale comment
+handling, and deterministic-test guidance gaps. The resulting patch also
+resolves the reference's contradictory ban on boundary-spy assertions and
+its requirement for unrelated fixture fields.
+
+Not all proposed restrictions were accepted: unchanged tests can already
+reproduce a bug; redundant assertions are not automatically merge blockers;
+a premium executor does not require a premium typo reviewer. Fable agreed
+with these corrections. Review severity follows the actual protection gap.
+
+Two fresh OpenAI coding-subagent sessions used the revised testing skill and
+reference on isolated local Python fixtures. They used the inherited model;
+this run did not expose an exact model ID or measure cost.
+
+- **Retry bug (live):** request counted the first call in max_attempts and
+  explained the external gateway's three-attempt default. The worker added
+  two focused tests beside the existing success test: table-driven exhaustion
+  and last-attempt success. The exhaustion cases failed before the fix
+  (4 vs 3, 2 vs 1, 6 vs 5 attempts); all three test methods passed after it.
+  Assertions checked real outcome, attempts, and pauses without sleeping.
+  One short comment explained the external limit; no constant-value test.
+- **Independent mutation check (executed):** ran those same tests with the
+  current function, the old off-by-one implementation, and a harmless
+  one-based-loop refactor injected in memory. Results respectively: 0, 3,
+  and 0 failures; no errors. Source files were not mutated.
+- **Internal enum addition (live):** worker added only PAUSED = 'Paused',
+  inspected existing generic rendering/escaping coverage, ran both tests
+  successfully, and exercised the new value. No new test or permission pause.
+
+These are bounded smoke checks, not representative benchmarks or proof of
+routing on real high-risk projects. Model routing remains statically reviewed.
+
+Fable's final verdict on the amended diff: ready for the updated draft PR.
+It independently reran both fixtures and the in-memory old-bug/refactor
+checks, then introduced missing-pause and swallowed-final-error mutants;
+both produced three failures. It also reran size/layout/whitespace checks
+and parsed the graphs. The GUI showed Fable 5.2 Medium; the reviewer itself
+could not introspect that effort label.
+
+The live smoke workers consumed testing guidance directly, not the complete
+SDD workflow. Worker-path resolution, reviewer reuse inspection/severity,
+and risk-based model routing are therefore statically reviewed, not exercised
+end-to-end. The reviewer saw resulting artifacts rather than worker transcripts;
+independent reruns establish failure sensitivity, not the workers' chronology.
